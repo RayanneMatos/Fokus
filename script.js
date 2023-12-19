@@ -6,8 +6,15 @@ const banner = document.querySelector('.app__image')
 const title = document.querySelector('.app__title')
 const botoes = document.querySelectorAll('.app__card-button')
 const musicaFocoInput = document.querySelector('#alternar-musica')
+const startPauseBt = document.querySelector('.start-pause')
+
 const musica = new Audio('/sons/luna-rise-part-one.mp3')
-musica.loop = true
+const musicaTempoFinalizado = new Audio('/sons/beep.mp3')
+const musicaPlay = new Audio('/sons/play.mp3')
+const musicaPause = new Audio('/sons/pause.mp3')
+
+let tempoDecorridoEmSegundos = 5
+let intervaloId = null
 
 
 function alterarContexto(contexto) {
@@ -21,20 +28,50 @@ function alterarContexto(contexto) {
             title.innerHTML = `Otimize sua produtividade,<br>
             <strong class="app__title-strong">mergulhe no que importa.</strong>`
 
-        break;
-
-        case "descanso-curto":
-            title.innerHTML = `Que tal dar uma respirada?,<br>
-            <strong class="app__title-strong">Faça uma pausa curta!</strong>`
-        break;
-
-        case "descanso-longo":
-            title.innerHTML = `Hora de voltar à superfície.,<br>
-            <strong class="app__title-strong">Faça uma pausa longa.</strong>`
-        default:
             break;
+            
+            case "descanso-curto":
+                title.innerHTML = `Que tal dar uma respirada?,<br>
+                <strong class="app__title-strong">Faça uma pausa curta!</strong>`
+                break;
+                
+                case "descanso-longo":
+                    title.innerHTML = `Hora de voltar à superfície.,<br>
+            <strong class="app__title-strong">Faça uma pausa longa.</strong>`
+            default:
+                break;
+            }
+        }
+
+const contagemRegressiva = () => {
+    if(tempoDecorridoEmSegundos <=0){
+        musicaTempoFinalizado.play()
+        zerar()
+        alert('Tempo finalizado!')
+        return
     }
+    tempoDecorridoEmSegundos -=1
+    console.log('Temporizador: ' + tempoDecorridoEmSegundos)
 }
+
+function iniciarOuPausar () {
+    if(intervaloId){
+        musicaPause.play();
+        zerar ()
+        return
+    }
+    musicaPlay.play();
+    intervaloId = setInterval(contagemRegressiva, 1000)
+}
+
+function zerar () {
+    clearInterval(intervaloId)
+    intervaloId = null
+}
+        
+        
+musica.loop = true
+        
 musicaFocoInput.addEventListener('change', () => {
     if(musica.paused) {
         musica.play()
@@ -58,3 +95,4 @@ longoBt.addEventListener('click', () => {
     longoBt.classList.add('active')
 })
 
+startPauseBt.addEventListener('click', iniciarOuPausar)
